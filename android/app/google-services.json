@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "783028812678",
+    "project_id": "nominal-group-app",
+    "storage_bucket": "nominal-group-app.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:783028812678:android:1809a3cd7992439389ca07",
+        "android_client_info": {
+          "package_name": "com.example.nominal_group"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBH8MBLtaJqN1mFN4NLTGKqJ-oZO0uTAJQ"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:783028812678:android:14c1242513a1853489ca07",
+        "android_client_info": {
+          "package_name": "com.example.nominal_group_app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBH8MBLtaJqN1mFN4NLTGKqJ-oZO0uTAJQ"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
