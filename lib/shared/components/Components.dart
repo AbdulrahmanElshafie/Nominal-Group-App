@@ -1,4 +1,3 @@
-import 'dart:io';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:nominal_group/models/Account.dart';
@@ -119,8 +118,8 @@ late Account user;
 FirebaseFirestore db = FirebaseFirestore.instance;
 
 
-getSuggestions(teamId){
-  db.collection("Teams").doc(teamId).collection('Suggestions').get().then(
+getSuggestions(teamId) async {
+  await db.collection("Teams").doc(teamId).collection('Suggestions').get().then(
         (querySnapshot) {
       saveSuggestions(querySnapshot, teamId);
     },
@@ -128,7 +127,7 @@ getSuggestions(teamId){
   );
 }
 
-saveSuggestions(querySnapshot, teamId){
+saveSuggestions(querySnapshot, teamId) async {
   List<Suggestion> crntSuggestions = [];
   for (var docSnapshot in querySnapshot.docs) {
 
@@ -139,7 +138,7 @@ saveSuggestions(querySnapshot, teamId){
 
     judgeSuggestion(suggestion);
 
-    db.collection('Teams').doc(teamId).collection('Suggestions').doc(docSnapshot.id).collection('Comments').get().then(
+    await db.collection('Teams').doc(teamId).collection('Suggestions').doc(docSnapshot.id).collection('Comments').get().then(
             (querySnapshot) {
           for(var docSnapshot in querySnapshot.docs) {
             Comment comment = Comment(comment: docSnapshot.data()['comment'], uid: docSnapshot.id, edits: docSnapshot.data()['edits']);
@@ -148,7 +147,7 @@ saveSuggestions(querySnapshot, teamId){
         }
     );
 
-    db.collection('Users').doc(user.uid).collection('Teams').doc(teamId)
+    await db.collection('Users').doc(user.uid).collection('Teams').doc(teamId)
         .collection('Suggestions').get().then(
             (querySnapshot) {
           for(var docSnapshot in querySnapshot.docs){
@@ -199,13 +198,12 @@ getPendingSuggestions(){
 
 updateSuggestions(teamId){
   getSuggestions(teamId);
-  sleep(const Duration(seconds: 2));
   getAcceptedSuggestions();
   getDeclinedSuggestions();
   getPendingSuggestions();
 }
 
-judgeSuggestion(Suggestion suggestion){
+judgeSuggestion(Suggestion suggestion) {
   if(DateTime.now().isAfter(suggestion.creationDate.add(const Duration(days: 3)))){
     if(suggestion.up > suggestion.down){
       suggestion.isAccepted = 1;

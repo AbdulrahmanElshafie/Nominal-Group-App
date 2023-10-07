@@ -1,4 +1,3 @@
-import 'dart:io';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:nominal_group/shared/components/Components.dart';
@@ -84,8 +83,8 @@ class Teams extends StatelessWidget{
                             children: [
                               TextInput(controller: teamUserNameController, label: 'Team Username'),
                               Btn(onTap:
-                                  (){
-                                    db.collection('Teams').doc(teamUserNameController.text.trim()).get().then(
+                                  () async {
+                                   await db.collection('Teams').doc(teamUserNameController.text.trim()).get().then(
                                           (DocumentSnapshot doc) {
                                         final data = doc.data() as Map<String, dynamic>;
                                         user.teams.add(Team(name: data['Team Name'], username: doc.id));
@@ -93,15 +92,16 @@ class Teams extends StatelessWidget{
                                       onError: (e) => print("Error getting document: $e"),
                                     );
 
-                                    db.collection('Users').doc(user.uid).collection('Teams').
+                                   db.collection('Users').doc(user.uid).collection('Teams').
                                     doc(teamUserNameController.text.trim()).set(
                                         {
                                           'Team Name': user.teams[0].name
                                         }
                                     );
 
+                                   updateSuggestions(teamUserNameController.text.trim());
+
                                     teamUserNameController.clear();
-                                    sleep(const Duration(seconds: 1));
                                     Navigator.pushNamed(context, '/home');
                               },
                                   name: 'Join Team'

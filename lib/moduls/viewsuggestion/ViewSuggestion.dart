@@ -1,11 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:nominal_group/models/Suggestion.dart';
-
 import '../../models/Comment.dart';
 import '../../shared/components/Components.dart';
 
 class ViewSuggestion extends StatefulWidget {
-  ViewSuggestion({super.key, required this.suggestion});
+  const ViewSuggestion({super.key, required this.suggestion});
   final Suggestion suggestion;
 
   @override
@@ -345,10 +344,10 @@ class _SuggestionState extends State<ViewSuggestion> {
                                     height: 20,
                                   ),
                                   TextButton(
-                                      onPressed: (){
+                                      onPressed: () async {
                                         Comment comment = Comment(comment: commentController.text, uid: user.uid);
                                         widget.suggestion.comments.add(comment);
-                                        db.collection('Teams').doc(user.teams[0].username).collection('Suggestions')
+                                       await db.collection('Teams').doc(user.teams[0].username).collection('Suggestions')
                                             .doc(widget.suggestion.sid).collection('Comments').doc(comment.uid).set(
                                             {
                                               'comment': commentController.text,

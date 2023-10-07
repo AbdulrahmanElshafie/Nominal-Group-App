@@ -40,19 +40,19 @@ class _SuggestionState extends State<DecidedSuggestion> {
                         children: [
                           Text(
                               'UpVotes ${widget.suggestion.up}',
-                            style: TextStyle(
+                            style: const TextStyle(
                               color: Colors.greenAccent,
                               fontWeight: FontWeight.bold,
                               fontSize: 20
 
                             ),
                           ),
-                          SizedBox(
+                          const SizedBox(
                             width: 10,
                           ),
                           Text(
                               'DownVotes: ${widget.suggestion.down}',
-                            style: TextStyle(
+                            style: const TextStyle(
                               color: Colors.redAccent,
                                 fontWeight: FontWeight.bold,
                                 fontSize: 20
@@ -60,16 +60,16 @@ class _SuggestionState extends State<DecidedSuggestion> {
                           ),
                         ],
                       ),
-                      SizedBox(
+                      const SizedBox(
                         height: 20,
                       ),
                       Row(
                         children: [
-                          Container(
+                          SizedBox(
                             width: MediaQuery.of(context).size.width*0.9,
                             child: Text(
                               widget.suggestion.description,
-                              style: TextStyle(
+                              style: const TextStyle(
                                   fontSize: 16
                               ),
                             ),
@@ -87,13 +87,13 @@ class _SuggestionState extends State<DecidedSuggestion> {
                 alignment: AlignmentDirectional.centerStart,
                 child: Column(
                   children: [
-                    Text(
+                    const Text(
                       'Comments',
                       style: TextStyle(
                           fontSize: 20
                       ),
                     ),
-                    SizedBox(
+                    const SizedBox(
                       height: 10,
                     ),
                     SizedBox(
@@ -114,7 +114,7 @@ class _SuggestionState extends State<DecidedSuggestion> {
                               Text(
                                   widget.suggestion.comments[index].comment
                               ),
-                              SizedBox(
+                              const SizedBox(
                                 height: 10,
                               )
                             ],

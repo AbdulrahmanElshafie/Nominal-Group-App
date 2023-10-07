@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:nominal_group/models/Suggestion.dart';
 import 'package:nominal_group/moduls/decidedsuggestions/DecidedSuggestion.dart';
@@ -41,8 +42,8 @@ class _HomeState extends State<Home> {
           icon: const Icon(
             Icons.refresh
           ),
-          onPressed: (){
-              updateSuggestions(user.teams[0].username);
+          onPressed: () async {
+              await updateSuggestions(user.teams[0].username);
               suggestions = user.teams[0].allSuggestions;
               a = Colors.blue;
               b = Colors.black;
@@ -100,7 +101,10 @@ class _HomeState extends State<Home> {
                 },
               );
             },
-            separatorBuilder: (BuildContext context, int index) => const Divider(),
+            separatorBuilder: (BuildContext context, int index) => const Divider(
+              thickness: 1,
+              color: Colors.black,
+            ),
             itemCount: suggestions.length,
           ),
           Row(
@@ -138,17 +142,18 @@ class _HomeState extends State<Home> {
                                             lines: 3,
                                           ),
                                           Btn(
-                                              onTap: (){
-                                                db.collection('Teams').doc(user.teams[0].username).collection('Suggestions').add(
+                                              onTap: () async {
+                                               await db.collection('Teams').doc(user.teams[0].username).collection('Suggestions').add(
                                                     {
                                                       'title': titleController.text.trim(),
                                                       'description': descriptionController.text.trim(),
                                                       'up': 0,
                                                       'down': 0,
                                                       'isAccepted': 0,
-                                                      'creationDate': DateTime.now()
+                                                      'creationDate': Timestamp.now()
                                                     }
                                                 );
+
                                                 titleController.clear();
                                                 descriptionController.clear();
                                                 updateSuggestions(user.teams[0].username);

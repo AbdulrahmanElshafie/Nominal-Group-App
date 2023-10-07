@@ -1,5 +1,3 @@
-import 'dart:io';
-
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
@@ -29,7 +27,7 @@ Future<void> main() async {
         }
     );
 
-   await db.collection('User').doc(user.uid).get().then(
+   await db.collection('Users').doc(user.uid).get().then(
             (docSnapshot) {
           user.email = docSnapshot.data()!['email'];
           user.name = docSnapshot.data()!['name'];
