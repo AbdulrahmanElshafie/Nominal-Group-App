@@ -29,7 +29,7 @@ class _HomeState extends State<Home> {
   Color a = Colors.blue, b = Colors.black, c = Colors.black, d = Colors.black;
 
   List<Suggestion> suggestions = user.teams[0].allSuggestions;
-
+  bool visible = true;
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -49,6 +49,7 @@ class _HomeState extends State<Home> {
               b = Colors.black;
               c = Colors.black;
               d = Colors.black;
+              visible = !visible;
               setState(() {
 
               });

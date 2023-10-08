@@ -151,10 +151,8 @@ class _SuggestionState extends State<ViewSuggestion> {
                                                               // Comment comment = Comment(comment: editingController.text, uid: user.uid);
                                                               widget.suggestion.comments[index].comment = editingController.text;
                                                               db.collection('Teams').doc(user.teams[0].username).collection('Suggestions')
-                                                                  .doc(widget.suggestion.sid).collection('Comments').doc(widget.suggestion.comments[index].uid).set(
+                                                                  .doc(widget.suggestion.sid).collection('Comments').doc(widget.suggestion.comments[index].uid).update(
                                                                   {
-                                                                    'comment': editingController.text,
-                                                                    'uid': user.uid,
                                                                     'edits': ++widget.suggestion.comments[index].edits
                                                                   }
                                                               );
@@ -233,13 +231,10 @@ class _SuggestionState extends State<ViewSuggestion> {
                                   down = 0;
                                   downIconColor = Colors.grey;
                                 }
-                                db.collection('Teams').doc(user.teams[0].username).collection('Suggestions').doc(widget.suggestion.sid).set(
+                                db.collection('Teams').doc(user.teams[0].username).collection('Suggestions').doc(widget.suggestion.sid).update(
                                     {
                                       'up': widget.suggestion.up + up,
                                       'down': widget.suggestion.down + down,
-                                      'title': widget.suggestion.title,
-                                      'description': widget.suggestion.description,
-                                      'isAccepted': widget.suggestion.isAccepted,
                                     }
                                 );
                                 db.collection('Users').doc(user.uid).collection('Teams').doc(user.teams[0].username)
@@ -278,13 +273,10 @@ class _SuggestionState extends State<ViewSuggestion> {
                                   up = 0;
                                   upIconColor = Colors.grey;
                                 }
-                                db.collection('Teams').doc(user.teams[0].username).collection('Suggestions').doc(widget.suggestion.sid).set(
+                                db.collection('Teams').doc(user.teams[0].username).collection('Suggestions').doc(widget.suggestion.sid).update(
                                     {
                                       'up': widget.suggestion.up + up,
                                       'down': widget.suggestion.down + down,
-                                      'title': widget.suggestion.title,
-                                      'description': widget.suggestion.description,
-                                      'isAccepted': widget.suggestion.isAccepted,
                                     }
                                 );
                                 db.collection('Users').doc(user.uid).collection('Teams').doc(user.teams[0].username)
