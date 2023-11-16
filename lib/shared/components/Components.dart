@@ -5,6 +5,7 @@ import 'package:translator/translator.dart';
 import '../../models/Comment.dart';
 import '../../models/Suggestion.dart';
 
+// Text Input
 class TextInput extends StatefulWidget{
   late final TextEditingController controller;
   int lines;
@@ -18,7 +19,7 @@ class TextInput extends StatefulWidget{
     required this.label,
     this.lines = 1,
     this.hideTxt = false,
-    this.isObscure = false
+    this.isObscure = true
   });
 
   @override
@@ -26,6 +27,8 @@ class TextInput extends StatefulWidget{
 }
 
 class _TextInputState extends State<TextInput> {
+  Icon _icon = const Icon(Icons.lock);
+  
   InputDecoration txtFieldDecoration(){
     if(widget.hideTxt == false){
       return InputDecoration(
@@ -37,16 +40,29 @@ class _TextInputState extends State<TextInput> {
         border: const OutlineInputBorder(),
         labelText: widget.label,
         suffixIcon: IconButton(
-          icon: const Icon(
-            Icons.remove_red_eye
-          ),
+          icon: _icon,
           onPressed: (){
             setState(() {
               widget.isObscure = !widget.isObscure;
+              if(widget.isObscure == true){
+                _icon = const Icon(Icons.lock);
+              } else {
+                _icon = const Icon(Icons.lock_open);
+              }
             });
           },
         )
       );
+    }
+  }
+
+  checkLang(txt) async {
+    final translator = GoogleTranslator();
+    Translation translation = await translator.translate(txt);
+    if(translation.sourceLanguage.code == 'ar'){
+      widget.direction = TextDirection.rtl;
+    } else {
+      widget.direction = TextDirection.ltr;
     }
   }
 
@@ -62,13 +78,7 @@ class _TextInputState extends State<TextInput> {
             decoration: txtFieldDecoration(),
             obscureText: widget.isObscure,
             onChanged: (txt) async {
-              final translator = GoogleTranslator();
-              Translation translation = await translator.translate(txt);
-              if(translation.sourceLanguage.code == 'ar'){
-                widget.direction = TextDirection.rtl;
-              } else {
-                widget.direction = TextDirection.ltr;
-              }
+              checkLang(txt);
               setState(() {
               });
             },
@@ -83,6 +93,7 @@ class _TextInputState extends State<TextInput> {
   }
 }
 
+// Btns
 class Btn extends StatelessWidget{
   final Function()? onTap;
   final String name;
@@ -117,7 +128,7 @@ class Btn extends StatelessWidget{
 late Account user;
 FirebaseFirestore db = FirebaseFirestore.instance;
 
-
+// Suggestions
 getSuggestions(teamId) async {
   await db.collection("Teams").doc(teamId).collection('Suggestions').get().then(
         (querySnapshot) {
@@ -135,8 +146,6 @@ saveSuggestions(querySnapshot, teamId) async {
         description: docSnapshot.data()['description'].toString().trim(), sid: docSnapshot.id,
         up: docSnapshot.data()['up'], down: docSnapshot.data()['down'], isAccepted: docSnapshot.data()['isAccepted'],
         creationDate:  (docSnapshot.data()['creationDate'] as Timestamp).toDate());
-
-    judgeSuggestion(suggestion);
 
     await db.collection('Teams').doc(teamId).collection('Suggestions').doc(docSnapshot.id).collection('Comments').get().then(
             (querySnapshot) {
@@ -161,39 +170,37 @@ saveSuggestions(querySnapshot, teamId) async {
 
     crntSuggestions.add(suggestion);
   }
-  user.teams[0].allSuggestions = crntSuggestions;
+  user.crntTeam.allSuggestions = crntSuggestions;
 }
-
-
 
 getAcceptedSuggestions(){
   List<Suggestion> accepted = [];
-  for(Suggestion suggestion in user.teams[0].allSuggestions){
+  for(Suggestion suggestion in user.crntTeam.allSuggestions){
     if(suggestion.isAccepted == 1){
       accepted.add(suggestion);
     }
   }
-  user.teams[0].acceptedSuggestions = accepted;
+  user.crntTeam.acceptedSuggestions = accepted;
 }
 
 getDeclinedSuggestions(){
   List<Suggestion> declined = [];
-  for(Suggestion suggestion in user.teams[0].allSuggestions){
+  for(Suggestion suggestion in user.crntTeam.allSuggestions){
     if(suggestion.isAccepted == 2){
       declined.add(suggestion);
     }
   }
-  user.teams[0].declinedSuggestions = declined;
+  user.crntTeam.declinedSuggestions = declined;
 }
 
 getPendingSuggestions(){
   List<Suggestion> pending = [];
-  for(Suggestion suggestion in user.teams[0].allSuggestions){
+  for(Suggestion suggestion in user.crntTeam.allSuggestions){
     if(suggestion.isAccepted == 0){
       pending.add(suggestion);
     }
   }
-  user.teams[0].pendingSuggestions = pending;
+  user.crntTeam.pendingSuggestions = pending;
 }
 
 updateSuggestions(teamId){
@@ -207,18 +214,83 @@ judgeSuggestion(Suggestion suggestion) {
   if(DateTime.now().isAfter(suggestion.creationDate.add(const Duration(days: 3)))){
     if(suggestion.up > suggestion.down){
       suggestion.isAccepted = 1;
-      db.collection('Teams').doc('seeforme ').collection('Suggestions').doc(suggestion.sid).update(
+      db.collection('Teams').doc(user.crntTeam.username).collection('Suggestions').doc(suggestion.sid).update(
           {
             'isAccepted': 1
           }
       );
     } else if (suggestion.down > suggestion.up) {
       suggestion.isAccepted = 2;
-      db.collection('Teams').doc('seeforme ').collection('Suggestions').doc(suggestion.sid).update(
+      db.collection('Teams').doc(user.crntTeam.username).collection('Suggestions').doc(suggestion.sid).update(
           {
             'isAccepted': 2
           }
       );
     }
+  }
+}
+
+// Navigation Bar
+class NavBar extends StatefulWidget{
+  int currentPageIndex;
+  NavBar({super.key, this.currentPageIndex = 0});
+
+
+  @override
+  State<NavBar> createState() => _NavBarState();
+}
+
+class _NavBarState extends State<NavBar> {
+
+  @override
+  Widget build(BuildContext context) {
+    return NavigationBar(
+      height: 90,
+      destinations: const [
+        NavigationDestination(
+          icon: Icon(Icons.home),
+          selectedIcon: Icon(Icons.home_outlined),
+          label: 'Home',
+          tooltip: 'Home Page For The Team',
+        ),
+        NavigationDestination(
+          icon: Icon(Icons.notification_add),
+          selectedIcon: Icon(Icons.notification_add_outlined),
+          label: 'Notifications',
+          tooltip: 'Your Notifications',
+        ),
+        NavigationDestination(
+          icon: Icon(Icons.people),
+          selectedIcon: Icon(Icons.people_outline),
+          label: 'Teams',
+          tooltip: 'Insights & Info About The Team',
+        ),
+        NavigationDestination(
+          icon: Icon(Icons.person),
+          selectedIcon: Icon(Icons.person_outline),
+          label: 'Profile',
+          tooltip: 'Your Profile',
+
+        ),
+      ],
+      selectedIndex: widget.currentPageIndex,
+      onDestinationSelected: (int index){
+        setState(() {
+          widget.currentPageIndex = index;
+          if(widget.currentPageIndex == 0){
+            Navigator.of(context).pushNamed('/home');
+          } else if (widget.currentPageIndex == 1){
+            Navigator.of(context).pushNamed('/notifications');
+          } else if (widget.currentPageIndex == 2){
+            Navigator.of(context).pushNamed('/teams');
+          } else if (widget.currentPageIndex == 3){
+            Navigator.of(context).pushNamed('/profile');
+          }
+
+        });
+      },
+      labelBehavior: NavigationDestinationLabelBehavior.onlyShowSelected,
+      // animationDuration: const Duration(microseconds: 1000),
+    );
   }
 }

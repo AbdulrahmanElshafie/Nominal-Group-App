@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:nominal_group/models/Suggestion.dart';
 import 'package:nominal_group/moduls/decidedsuggestions/DecidedSuggestion.dart';
+import '../../models/Team.dart';
 import '../../shared/components/Components.dart';
 import '../viewsuggestion/ViewSuggestion.dart';
 
@@ -16,6 +17,8 @@ class _HomeState extends State<Home> {
   TextEditingController titleController = TextEditingController(),
   descriptionController = TextEditingController();
 
+  int currentPageIndex = 0;
+
   Color setSuggestionColor(isAccepted){
     if(isAccepted == 0){
       return Colors.grey;
@@ -28,14 +31,14 @@ class _HomeState extends State<Home> {
 
   Color a = Colors.blue, b = Colors.black, c = Colors.black, d = Colors.black;
 
-  List<Suggestion> suggestions = user.teams[0].allSuggestions;
+  List<Suggestion> suggestions = user.crntTeam.allSuggestions;
   bool visible = true;
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: Text(
-          user.teams[0].name
+          user.crntTeam.name
         ),
         centerTitle: true,
         leading: IconButton(
@@ -43,8 +46,8 @@ class _HomeState extends State<Home> {
             Icons.refresh
           ),
           onPressed: () async {
-              await updateSuggestions(user.teams[0].username);
-              suggestions = user.teams[0].allSuggestions;
+              await updateSuggestions(user.crntTeam.username);
+              suggestions = user.crntTeam.allSuggestions;
               a = Colors.blue;
               b = Colors.black;
               c = Colors.black;
@@ -59,55 +62,55 @@ class _HomeState extends State<Home> {
       body: Stack(
         children: [
           ListView.separated(
-            itemBuilder: (BuildContext context, int index){
-              return GestureDetector(
-                child: Container(
-                  height: 150,
-                  width: double.infinity,
-                  color: setSuggestionColor(suggestions[index].isAccepted),
-                  // color: Colors.amber[colorCodes[index]],
-                  child: Padding(
-                    padding: const EdgeInsets.only(left: 8, right: 8),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Text(
-                          suggestions.elementAt(index).title,
-                          style: const TextStyle(
-                              fontWeight: FontWeight.bold,
-                              fontSize: 18
-                          ),
+          itemBuilder: (BuildContext context, int index){
+            return GestureDetector(
+              child: Container(
+                height: 150,
+                width: double.infinity,
+                color: setSuggestionColor(suggestions[index].isAccepted),
+                // color: Colors.amber[colorCodes[index]],
+                child: Padding(
+                  padding: const EdgeInsets.only(left: 8, right: 8),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text(
+                        suggestions.elementAt(index).title,
+                        style: const TextStyle(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 18
                         ),
-                        const SizedBox(
-                          height: 10,
+                      ),
+                      const SizedBox(
+                        height: 10,
+                      ),
+                      Text(
+                        suggestions.elementAt(index).description,
+                        maxLines: 2,
+                        style: const TextStyle(
+                          fontSize: 16,
                         ),
-                        Text(
-                          suggestions.elementAt(index).description,
-                          maxLines: 2,
-                          style: const TextStyle(
-                            fontSize: 16,
-                          ),
-                        ),
-                      ],
-                    ),
+                      ),
+                    ],
                   ),
                 ),
-                onTap: (){
-                  if(suggestions[index].isAccepted == 0){
-                    Navigator.push(context, MaterialPageRoute(builder: (context) => ViewSuggestion(suggestion: suggestions[index])));
-                  } else {
-                    Navigator.push(context, MaterialPageRoute(builder: (context) => DecidedSuggestion(suggestion: suggestions[index])));
-                  }
-                },
-              );
-            },
-            separatorBuilder: (BuildContext context, int index) => const Divider(
-              thickness: 1,
-              color: Colors.black,
-            ),
-            itemCount: suggestions.length,
+              ),
+              onTap: (){
+                if(suggestions[index].isAccepted == 0){
+                  Navigator.push(context, MaterialPageRoute(builder: (context) => ViewSuggestion(suggestion: suggestions[index])));
+                } else {
+                  Navigator.push(context, MaterialPageRoute(builder: (context) => DecidedSuggestion(suggestion: suggestions[index])));
+                }
+              },
+            );
+          },
+          separatorBuilder: (BuildContext context, int index) => const Divider(
+            thickness: 1,
+            color: Colors.black,
           ),
+          itemCount: suggestions.length,
+        ),
           Row(
             mainAxisAlignment: MainAxisAlignment.end,
             children: [
@@ -144,7 +147,7 @@ class _HomeState extends State<Home> {
                                           ),
                                           Btn(
                                               onTap: () async {
-                                               await db.collection('Teams').doc(user.teams[0].username).collection('Suggestions').add(
+                                               await db.collection('Teams').doc(user.crntTeam.username).collection('Suggestions').add(
                                                     {
                                                       'title': titleController.text.trim(),
                                                       'description': descriptionController.text.trim(),
@@ -157,7 +160,7 @@ class _HomeState extends State<Home> {
 
                                                 titleController.clear();
                                                 descriptionController.clear();
-                                                updateSuggestions(user.teams[0].username);
+                                                updateSuggestions(user.crntTeam.username);
                                                 Navigator.pop(context);
                                                 setState(() {
 
@@ -199,7 +202,7 @@ class _HomeState extends State<Home> {
                                 PopupMenuItem(
                                   value: 1,
                                   onTap: (){
-                                      suggestions = user.teams[0].allSuggestions;
+                                      suggestions = user.crntTeam.allSuggestions;
                                   },
                                   textStyle: TextStyle(
                                     color: a
@@ -209,7 +212,7 @@ class _HomeState extends State<Home> {
                                 PopupMenuItem(
                                   value: 2,
                                   onTap: (){
-                                    suggestions = user.teams[0].pendingSuggestions;
+                                    suggestions = user.crntTeam.pendingSuggestions;
                                   },
                                   textStyle: TextStyle(
                                     color: b,
@@ -219,7 +222,7 @@ class _HomeState extends State<Home> {
                                 PopupMenuItem(
                                   value: 3,
                                   onTap: (){
-                                    suggestions = user.teams[0].acceptedSuggestions;
+                                    suggestions = user.crntTeam.acceptedSuggestions;
                                   },
                                   textStyle: TextStyle(
                                     color: c
@@ -229,7 +232,7 @@ class _HomeState extends State<Home> {
                                 PopupMenuItem(
                                   value: 4,
                                   onTap: (){
-                                    suggestions = user.teams[0].declinedSuggestions;
+                                    suggestions = user.crntTeam.declinedSuggestions;
                                   },
                                   textStyle: TextStyle(
                                     color: d
@@ -274,6 +277,7 @@ class _HomeState extends State<Home> {
           )
         ],
       ),
+      bottomNavigationBar: NavBar(currentPageIndex: 0,),
     );
   }
 }

@@ -30,11 +30,14 @@ class Register extends StatelessWidget{
               children: [
                 TextInput(
                     controller: nameController,
-                    label: 'Name'
+                    label: 'Name',
+                    isObscure: false,
                 ),
                 TextInput(
                     controller: emailController,
-                    label: 'Email'
+                    label: 'Email',
+                    isObscure: false,
+
                 ),
                 TextInput(
                   controller: passwordController,

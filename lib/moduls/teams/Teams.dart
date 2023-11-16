@@ -1,12 +1,19 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
+import 'package:nominal_group/models/Account.dart';
 import 'package:nominal_group/shared/components/Components.dart';
 import '../../models/Team.dart';
 
-class Teams extends StatelessWidget{
+class Teams extends StatefulWidget{
   Teams({super.key});
-  TextEditingController teamNameController = TextEditingController(),
-      teamUserNameController = TextEditingController();
+
+  @override
+  State<Teams> createState() => _TeamsState();
+}
+
+class _TeamsState extends State<Teams> {
+  TextEditingController newTeamNameController = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
@@ -20,104 +27,187 @@ class Teams extends StatelessWidget{
           Icons.people
         ),
       ),
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Btn(
-                onTap: (){
-                  showDialog(
-                      context: context,
-                      builder: (BuildContext context){
-                        return AlertDialog(
-                          title: const Text(
-                            'Create a Team'
-                          ),
-                          content: Column(
-                            mainAxisSize: MainAxisSize.min,
+      body: SingleChildScrollView(
+        child: Center(
+          child: Padding(
+            padding: const EdgeInsets.symmetric(vertical: 20),
+            child: Column(
+              children: [
+                Text(
+                  'Team Name: ${user.crntTeam.name}',
+                  style: const TextStyle(
+                    fontSize: 25
+                  ),
+                ),
+                const SizedBox(
+                  height: 15,
+                ),
+                const Text(
+                    "Suggestions",
+                  style: TextStyle(
+                      fontSize: 20
+                  ),
+                ),
+                const SizedBox(
+                  height: 10,
+                ),
+                Text(
+                  'Accepted Suggestions: ${user.crntTeam.acceptedSuggestions.length}',
+                  style: const TextStyle(
+                      fontSize: 18
+                  ),
+                ),
+                const SizedBox(
+                  height: 10,
+                ),
+                Text(
+                  'Declined Suggestions: ${user.crntTeam.declinedSuggestions.length}',
+                  style: const TextStyle(
+                      fontSize: 18
+                  ),
+                ),
+                const SizedBox(
+                  height: 10,
+                ),
+                Text(
+                  'Pending Suggestions: ${user.crntTeam.pendingSuggestions.length}',
+                  style: const TextStyle(
+                      fontSize: 18
+                  ),
+                ),
+                const SizedBox(
+                  height: 15,
+                ),
+                SizedBox(
+                  height: 300,
+                  child: ListView.separated(
+                    itemBuilder: (BuildContext context, int index){
+                      return Container(
+                        height: 80,
+                        width: double.infinity,
+                        color: Colors.blue[400],
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 20),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            mainAxisAlignment: MainAxisAlignment.center,
                             children: [
-                              TextInput(controller: teamNameController, label: 'Team Name'),
-                              TextInput(controller: teamUserNameController, label: 'Team Username'),
-                              Btn(onTap:
-                                  (){
-                                    db.collection('Users').doc(user.uid).collection('Teams').
-                                    doc(teamUserNameController.text.trim()).set(
-                                        {
-                                          'Team Name': teamNameController.text.trim()
-                                        }
-                                    );
-                                    db.collection('Teams').doc(teamUserNameController.text.trim()).set(
-                                        {
-                                          'Team Name': teamNameController.text.trim()
-                                        }
-                                    );
-                                    user.teams.add(Team(name: teamNameController.text.trim(), username: teamUserNameController.text.trim()));
-                                    teamUserNameController.clear();
-                                    teamNameController.clear();
-                                    Navigator.pushNamed(context, '/home');
-                                  },
-                                  name: 'Create Team'
-                              )
+                              Text(
+                                user.crntTeam.members.elementAt(index).name,
+                                style: const TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 15
+                                ),
+                              ),
+                              const SizedBox(
+                                height: 10,
+                              ),
+                              Text(
+                                user.crntTeam.members.elementAt(index).email,
+                                style: const TextStyle(
+                                    fontSize: 13
+                                ),
+                              ),
                             ],
                           ),
-                        );
-                      }
-                  );
-                },
-                name: 'Create a Team'
-            ),
-            const SizedBox(
-              height: 20,
-            ),
-            Btn(
-                onTap: (){
-                  showDialog(
-                      context: context,
-                      builder: (BuildContext context){
-                        return AlertDialog(
-                          title: const Text(
-                              'Create a Team'
-                          ),
-                          content: Column(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              TextInput(controller: teamUserNameController, label: 'Team Username'),
-                              Btn(onTap:
-                                  () async {
-                                   await db.collection('Teams').doc(teamUserNameController.text.trim()).get().then(
-                                          (DocumentSnapshot doc) {
-                                        final data = doc.data() as Map<String, dynamic>;
-                                        user.teams.add(Team(name: data['Team Name'], username: doc.id));
+                        ),
+                      );
+                    },
+                    separatorBuilder: (BuildContext context, int index) => const Divider(
+                      thickness: 1,
+                      color: Colors.black,
+                    ),
+                    itemCount: user.crntTeam.members.length,
+                  ),
+                ),
+                const SizedBox(
+                  height: 15,
+                ),
+                Btn(
+                    onTap: (){
+                      showDialog(
+                          context: context,
+                          builder: (BuildContext context){
+                            return AlertDialog(
+                              title: Text('Delete the Team, Sure? '),
+                              content: Column(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Btn(
+                                      onTap: (){
+                                        db.collection('Teams').doc(user.crntTeam.username).delete();
+
+                                        for(Account member in user.crntTeam.members){
+                                          db.collection('Users').doc(member.uid).collection('Teams').doc(user.crntTeam.username).delete();
+                                        }
+
+                                        user.teams.remove(user.crntTeam);
+                                        setState(() {
+
+                                        });
+                                        Navigator.pop(context);
+                                        user.crntTeam = user.teams.last;
+                                        Navigator.pushNamed(context, '/home');
                                       },
-                                      onError: (e) => print("Error getting document: $e"),
-                                    );
+                                      name: 'Delete Team'
+                                  )
+                                ],
+                              ),
+                            );
+                          }
+                      );
+                    },
+                    name: 'Delete Team'
+                ),
+                const SizedBox(
+                  height: 20,
+                ),
+                Btn(
+                    onTap: (){
+                        showDialog(
+                            context: context,
+                            builder: (BuildContext context){
+                             return AlertDialog(
+                               title: Text('Change Team Name'),
+                               content: Column(
+                                 mainAxisSize: MainAxisSize.min,
+                                 children: [
+                                   TextInput(
+                                       controller: newTeamNameController,
+                                       label: 'New Team Name',
+                                       isObscure: false,
+                                   ),
+                                   Btn(
+                                       onTap: (){
+                                         db.collection('Teams').doc(user.crntTeam.username).update(
+                                           {
+                                             'Team Name': newTeamNameController.text.trim()
+                                           }
+                                         );
+                                         user.crntTeam.name = newTeamNameController.text.trim();
+                                         setState(() {
 
-                                   db.collection('Users').doc(user.uid).collection('Teams').
-                                    doc(teamUserNameController.text.trim()).set(
-                                        {
-                                          'Team Name': user.teams[0].name
-                                        }
-                                    );
-
-                                   updateSuggestions(teamUserNameController.text.trim());
-
-                                    teamUserNameController.clear();
-                                    Navigator.pushNamed(context, '/home');
-                              },
-                                  name: 'Join Team'
-                              )
-                            ],
-                          ),
+                                         });
+                                         Navigator.pop(context);
+                                       },
+                                       name: 'Confirm'
+                                   )
+                                 ],
+                               ),
+                             );
+                            }
                         );
-                      }
-                  );
-                },
-                name: 'Join a Team'
-            )
-          ],
+                    },
+                    name: 'Change Team Name'
+                ),
+
+              ],
+            ),
+          ),
         ),
       ),
+      bottomNavigationBar: NavBar(currentPageIndex: 2,),
+
     );
   }
-
 }

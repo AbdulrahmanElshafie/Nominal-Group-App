@@ -150,7 +150,7 @@ class _SuggestionState extends State<ViewSuggestion> {
                                                             onPressed: (){
                                                               // Comment comment = Comment(comment: editingController.text, uid: user.uid);
                                                               widget.suggestion.comments[index].comment = editingController.text;
-                                                              db.collection('Teams').doc(user.teams[0].username).collection('Suggestions')
+                                                              db.collection('Teams').doc(user.crntTeam.username).collection('Suggestions')
                                                                   .doc(widget.suggestion.sid).collection('Comments').doc(widget.suggestion.comments[index].uid).update(
                                                                   {
                                                                     'edits': ++widget.suggestion.comments[index].edits
@@ -231,13 +231,13 @@ class _SuggestionState extends State<ViewSuggestion> {
                                   down = 0;
                                   downIconColor = Colors.grey;
                                 }
-                                db.collection('Teams').doc(user.teams[0].username).collection('Suggestions').doc(widget.suggestion.sid).update(
+                                db.collection('Teams').doc(user.crntTeam.username).collection('Suggestions').doc(widget.suggestion.sid).update(
                                     {
                                       'up': widget.suggestion.up + up,
                                       'down': widget.suggestion.down + down,
                                     }
                                 );
-                                db.collection('Users').doc(user.uid).collection('Teams').doc(user.teams[0].username)
+                                db.collection('Users').doc(user.uid).collection('Teams').doc(user.crntTeam.username)
                                     .collection('Suggestions').doc(widget.suggestion.sid).set(
                                     {
                                       'choice': widget.suggestion.choice
@@ -273,13 +273,13 @@ class _SuggestionState extends State<ViewSuggestion> {
                                   up = 0;
                                   upIconColor = Colors.grey;
                                 }
-                                db.collection('Teams').doc(user.teams[0].username).collection('Suggestions').doc(widget.suggestion.sid).update(
+                                db.collection('Teams').doc(user.crntTeam.username).collection('Suggestions').doc(widget.suggestion.sid).update(
                                     {
                                       'up': widget.suggestion.up + up,
                                       'down': widget.suggestion.down + down,
                                     }
                                 );
-                                db.collection('Users').doc(user.uid).collection('Teams').doc(user.teams[0].username)
+                                db.collection('Users').doc(user.uid).collection('Teams').doc(user.crntTeam.username)
                                 .collection('Suggestions').doc(widget.suggestion.sid).set(
                                   {
                                     'choice': widget.suggestion.choice
@@ -339,7 +339,7 @@ class _SuggestionState extends State<ViewSuggestion> {
                                       onPressed: () async {
                                         Comment comment = Comment(comment: commentController.text, uid: user.uid);
                                         widget.suggestion.comments.add(comment);
-                                       await db.collection('Teams').doc(user.teams[0].username).collection('Suggestions')
+                                       await db.collection('Teams').doc(user.crntTeam.username).collection('Suggestions')
                                             .doc(widget.suggestion.sid).collection('Comments').doc(comment.uid).set(
                                             {
                                               'comment': commentController.text,

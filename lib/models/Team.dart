@@ -1,8 +1,10 @@
+import 'Account.dart';
 import 'Suggestion.dart';
 
 class Team{
   late String name;
   late String username;
+  List<Account> members = [];
   List<Suggestion> allSuggestions = [];
   List<Suggestion> acceptedSuggestions = [];
   List<Suggestion> declinedSuggestions = [];
