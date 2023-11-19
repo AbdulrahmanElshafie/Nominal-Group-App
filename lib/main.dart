@@ -7,9 +7,10 @@ import 'package:nominal_group/moduls/login/Login.dart';
 import 'package:nominal_group/moduls/notifications/Notifications.dart';
 import 'package:nominal_group/moduls/profile/Profile.dart';
 import 'package:nominal_group/moduls/register/Register.dart';
+import 'package:nominal_group/moduls/team/Member.dart';
 import 'models/Account.dart';
 import 'models/Team.dart';
-import 'moduls/teams/Teams.dart';
+import 'moduls/team/TeamScreen.dart';
 import 'shared/components/Components.dart';
 import 'shared/network/remote/firebase_options.dart';
 
@@ -20,28 +21,38 @@ Future<void> main() async {
   );
   if(FirebaseAuth.instance.currentUser != null) {
     user = Account(uid: FirebaseAuth.instance.currentUser!.uid);
-
    await db.collection('Users').doc(user.uid).collection('Teams').get().then(
             (querySnapshot) async {
           for (var docSnapshot in querySnapshot.docs) {
-            user.teams.add(Team(name: docSnapshot.data()['Team Name'],
-                username: docSnapshot.id));
 
+            Team team = Team(name: docSnapshot.data()['Team Name'], username: docSnapshot.id);
             await db.collection('Teams').doc(docSnapshot.id).collection('Members').get().then(
                     (querySnapshot2) async {
+
                       for(var docSnapshot2 in querySnapshot2.docs){
+
                         Account member = Account(uid: docSnapshot2.id);
-                        db.collection('Users').doc(docSnapshot2.id).get().then(
+                       await db.collection('Users').doc(docSnapshot2.id).get().then(
                             (DocumentSnapshot doc){
                               final data = doc.data() as Map<String, dynamic>;
                               member.name = data['name'];
                               member.email = data['email'];
                             }
                         );
-                        user.teams.last.members.add(member);
+                        team.members.add(member);
                       }
                     }
+
             );
+
+            await db.collection('Teams').doc(docSnapshot.id).get().then(
+                (DocumentSnapshot doc) async {
+                  final data = doc.data() as Map<String, dynamic>;
+                  team.ownerID = data['ownerID'];
+                }
+            );
+
+            user.teams.add(team);
           }
         }
     );
@@ -76,11 +87,11 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      home: Home(),
+      home: start(),
       routes: {
         '/login': (context) =>  Login(),
         'register': (context) => Register(),
-        '/teams': (context) => Teams(),
+        '/teams': (context) => TeamScreen(),
         '/home': (context) => const Home(),
         '/profile': (context) => Profile(),
         '/notifications': (context) => const Notifications(),

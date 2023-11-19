@@ -4,6 +4,7 @@ import 'Suggestion.dart';
 class Team{
   late String name;
   late String username;
+  late String ownerID;
   List<Account> members = [];
   List<Suggestion> allSuggestions = [];
   List<Suggestion> acceptedSuggestions = [];

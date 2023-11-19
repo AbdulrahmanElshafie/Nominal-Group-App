@@ -262,7 +262,7 @@ class _NavBarState extends State<NavBar> {
         NavigationDestination(
           icon: Icon(Icons.people),
           selectedIcon: Icon(Icons.people_outline),
-          label: 'Teams',
+          label: 'Team',
           tooltip: 'Insights & Info About The Team',
         ),
         NavigationDestination(

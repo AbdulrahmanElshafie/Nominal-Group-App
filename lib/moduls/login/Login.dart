@@ -30,7 +30,8 @@ class Login extends StatelessWidget{
               children: [
                 TextInput(
                     controller: emailController,
-                    label: 'Email'
+                    label: 'Email',
+                    isObscure: false,
                 ),
                 TextInput(
                     controller: passwordController,
@@ -68,7 +69,7 @@ class Login extends StatelessWidget{
                                   }
                                 }
                             );
-                            Navigator.pushNamed(context, '/teams');
+                            Navigator.pushNamed(context, '/home');
                           }
                         } on FirebaseAuthException catch (e) {
                            if (e.code == 'INVALID_LOGIN_CREDENTIALS') {
@@ -88,6 +89,7 @@ class Login extends StatelessWidget{
                           }
                         }
                       }
+                     user.crntTeam = user.teams.first;
                     },
                     name: 'Login'),
                 const SizedBox(

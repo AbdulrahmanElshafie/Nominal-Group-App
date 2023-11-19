@@ -138,11 +138,13 @@ class _HomeState extends State<Home> {
                                         children: [
                                           TextInput(
                                               controller: titleController,
-                                              label: 'Suggestion Title'
+                                              label: 'Suggestion Title',
+                                              isObscure: false,
                                           ),
                                           TextInput(
                                             controller: descriptionController,
                                             label: 'Description',
+                                            isObscure: false,
                                             lines: 3,
                                           ),
                                           Btn(

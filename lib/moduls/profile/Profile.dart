@@ -1,5 +1,3 @@
-import 'dart:ffi';
-
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 
@@ -119,8 +117,8 @@ class Profile extends StatelessWidget {
                               children: [
                                 TextInput(controller: teamNameController, label: 'Team Name', isObscure: false,),
                                 TextInput(controller: teamUserNameController, label: 'Team Username', isObscure: false,),
-                                Btn(onTap:
-                                    (){
+                                Btn(
+                                    onTap: (){
                                   db.collection('Users').doc(user.uid).collection('Teams').
                                   doc(teamUserNameController.text.trim()).set(
                                       {
@@ -129,13 +127,17 @@ class Profile extends StatelessWidget {
                                   );
                                   db.collection('Teams').doc(teamUserNameController.text.trim()).set(
                                       {
-                                        'Team Name': teamNameController.text.trim()
+                                        'Team Name': teamNameController.text.trim(),
+                                        'ownerID': user.uid
                                       }
                                   );
 
                                   db.collection('Teams').doc(teamUserNameController.text.trim()).collection('Members').doc(user.uid).set({});
 
-                                  user.teams.add(Team(name: teamNameController.text.trim(), username: teamUserNameController.text.trim()));
+                                  Team team = Team(name: teamNameController.text.trim(), username: teamUserNameController.text.trim());
+                                  team.ownerID = user.uid;
+                                  user.teams.add(team);
+
                                   user.crntTeam = user.teams.last;
                                   user.crntTeam.members.add(user);
 
@@ -184,8 +186,13 @@ class Profile extends StatelessWidget {
                                       if(isJoined == false){
                                         await db.collection('Teams').doc(teamUserNameController.text.trim()).get().then(
                                               (DocumentSnapshot doc) {
+
                                             final data = doc.data() as Map<String, dynamic>;
-                                            user.teams.add(Team(name: data['Team Name'], username: doc.id));
+
+                                            Team team = Team(name: data['Team Name'], username: doc.id);
+                                            team.ownerID = data['ownerID'];
+                                            user.teams.add(team);
+
                                             user.crntTeam = user.teams.last;
                                           },
                                           onError: (e) => print("Error getting document: $e"),

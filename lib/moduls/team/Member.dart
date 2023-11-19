@@ -1,30 +1,19 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
-import 'package:nominal_group/models/Account.dart';
-import 'package:nominal_group/shared/components/Components.dart';
-import '../../models/Team.dart';
+import '../../shared/components/Components.dart';
 
-class Teams extends StatefulWidget{
-  Teams({super.key});
-
-  @override
-  State<Teams> createState() => _TeamsState();
-}
-
-class _TeamsState extends State<Teams> {
-  TextEditingController newTeamNameController = TextEditingController();
+class MemberScreen extends StatelessWidget {
+  const MemberScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: const Text(
-          'Teams'
+            'Team Dashboard'
         ),
         centerTitle: true,
         leading: const Icon(
-          Icons.people
+            Icons.people
         ),
       ),
       body: SingleChildScrollView(
@@ -36,14 +25,14 @@ class _TeamsState extends State<Teams> {
                 Text(
                   'Team Name: ${user.crntTeam.name}',
                   style: const TextStyle(
-                    fontSize: 25
+                      fontSize: 25
                   ),
                 ),
                 const SizedBox(
                   height: 15,
                 ),
                 const Text(
-                    "Suggestions",
+                  "Suggestions",
                   style: TextStyle(
                       fontSize: 20
                   ),
@@ -129,27 +118,23 @@ class _TeamsState extends State<Teams> {
                           context: context,
                           builder: (BuildContext context){
                             return AlertDialog(
-                              title: Text('Delete the Team, Sure? '),
+                              title: Text('Leave the Team, Sure? '),
                               content: Column(
                                 mainAxisSize: MainAxisSize.min,
                                 children: [
                                   Btn(
                                       onTap: (){
-                                        db.collection('Teams').doc(user.crntTeam.username).delete();
-
-                                        for(Account member in user.crntTeam.members){
-                                          db.collection('Users').doc(member.uid).collection('Teams').doc(user.crntTeam.username).delete();
-                                        }
-
+                                        db.collection('Users').doc(user.uid).collection('Teams').doc(user.crntTeam.username).delete();
+                                        db.collection('Teams').doc(user.crntTeam.username).collection('Members').doc(user.uid).delete();
                                         user.teams.remove(user.crntTeam);
-                                        setState(() {
-
-                                        });
+                                        // setState(() {
+                                        //
+                                        // });
                                         Navigator.pop(context);
                                         user.crntTeam = user.teams.last;
                                         Navigator.pushNamed(context, '/home');
                                       },
-                                      name: 'Delete Team'
+                                      name: 'Leave Team'
                                   )
                                 ],
                               ),
@@ -157,48 +142,7 @@ class _TeamsState extends State<Teams> {
                           }
                       );
                     },
-                    name: 'Delete Team'
-                ),
-                const SizedBox(
-                  height: 20,
-                ),
-                Btn(
-                    onTap: (){
-                        showDialog(
-                            context: context,
-                            builder: (BuildContext context){
-                             return AlertDialog(
-                               title: Text('Change Team Name'),
-                               content: Column(
-                                 mainAxisSize: MainAxisSize.min,
-                                 children: [
-                                   TextInput(
-                                       controller: newTeamNameController,
-                                       label: 'New Team Name',
-                                       isObscure: false,
-                                   ),
-                                   Btn(
-                                       onTap: (){
-                                         db.collection('Teams').doc(user.crntTeam.username).update(
-                                           {
-                                             'Team Name': newTeamNameController.text.trim()
-                                           }
-                                         );
-                                         user.crntTeam.name = newTeamNameController.text.trim();
-                                         setState(() {
-
-                                         });
-                                         Navigator.pop(context);
-                                       },
-                                       name: 'Confirm'
-                                   )
-                                 ],
-                               ),
-                             );
-                            }
-                        );
-                    },
-                    name: 'Change Team Name'
+                    name: 'Leave Team'
                 ),
 
               ],
