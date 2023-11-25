@@ -8,6 +8,6 @@ class TeamScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return user.crntTeam.ownerID == user.uid? AdminScreen(): MemberScreen();
+    return user.crntTeam.ownerID == user.uid? const AdminScreen(): const MemberScreen();
   }
 }
