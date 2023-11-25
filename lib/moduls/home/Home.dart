@@ -2,7 +2,6 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:nominal_group/models/Suggestion.dart';
 import 'package:nominal_group/moduls/decidedsuggestions/DecidedSuggestion.dart';
-import '../../models/Team.dart';
 import '../../shared/components/Components.dart';
 import '../viewsuggestion/ViewSuggestion.dart';
 
@@ -19,9 +18,9 @@ class _HomeState extends State<Home> {
 
   int currentPageIndex = 0;
 
-  Color setSuggestionColor(isAccepted){
+  Color? setSuggestionColor(isAccepted){
     if(isAccepted == 0){
-      return Colors.grey;
+      return Colors.grey[300];
     } else if (isAccepted == 1){
       return Colors.greenAccent;
     } else {
@@ -46,7 +45,7 @@ class _HomeState extends State<Home> {
             Icons.refresh
           ),
           onPressed: () async {
-              await updateSuggestions(user.crntTeam.username);
+              await updateAll(user.crntTeam.username);
               suggestions = user.crntTeam.allSuggestions;
               a = Colors.blue;
               b = Colors.black;
@@ -108,6 +107,7 @@ class _HomeState extends State<Home> {
           separatorBuilder: (BuildContext context, int index) => const Divider(
             thickness: 1,
             color: Colors.black,
+            height: 0,
           ),
           itemCount: suggestions.length,
         ),
@@ -149,7 +149,7 @@ class _HomeState extends State<Home> {
                                           ),
                                           Btn(
                                               onTap: () async {
-                                               await db.collection('Teams').doc(user.crntTeam.username).collection('Suggestions').add(
+                                                var sid = await db.collection('Teams').doc(user.crntTeam.username).collection('Suggestions').add(
                                                     {
                                                       'title': titleController.text.trim(),
                                                       'description': descriptionController.text.trim(),
@@ -159,6 +159,21 @@ class _HomeState extends State<Home> {
                                                       'creationDate': Timestamp.now()
                                                     }
                                                 );
+
+                                                for(var member in user.crntTeam.members){
+                                                  if(member.uid != user.uid){
+                                                    await db.collection('Users').doc(member.uid).collection('Notifications').add(
+                                                      {
+                                                      'seen': false,
+                                                      'type': 0,
+                                                      'Team Name': user.crntTeam.name,
+                                                      'Team Username': user.crntTeam.username,
+                                                      'Suggestion Title': titleController.text.trim(),
+                                                      'sid': sid.id
+                                                      }
+                                                    );
+                                                  }
+                                                }
 
                                                 titleController.clear();
                                                 descriptionController.clear();
@@ -177,7 +192,8 @@ class _HomeState extends State<Home> {
                             );
                           },
                           icon: const Icon(
-                              Icons.add
+                              Icons.add,
+                              color: Colors.white,
                           )
                       ),
                     ),
@@ -206,44 +222,53 @@ class _HomeState extends State<Home> {
                                   onTap: (){
                                       suggestions = user.crntTeam.allSuggestions;
                                   },
-                                  textStyle: TextStyle(
-                                    color: a
-                                  ),
-                                    child: const Text('All Suggestions'),
+                                    child: Text(
+                                      'All Suggestions',
+                                      style: TextStyle(
+                                        color: a,
+                                      ),
+                                    ),
                                 ),
                                 PopupMenuItem(
                                   value: 2,
                                   onTap: (){
                                     suggestions = user.crntTeam.pendingSuggestions;
                                   },
-                                  textStyle: TextStyle(
-                                    color: b,
+                                  child: Text(
+                                    'Pending Suggestions',
+                                    style: TextStyle(
+                                        color: b,
+                                    ),
                                   ),
-                                  child: const Text('Pending Suggestions'),
                                 ),
                                 PopupMenuItem(
                                   value: 3,
                                   onTap: (){
                                     suggestions = user.crntTeam.acceptedSuggestions;
                                   },
-                                  textStyle: TextStyle(
-                                    color: c
+                                  child: Text(
+                                    'Accepted Suggestions',
+                                    style: TextStyle(
+                                      color: c
+                                    ),
                                   ),
-                                  child: const Text('Accepted Suggestions'),
                                 ),
                                 PopupMenuItem(
                                   value: 4,
                                   onTap: (){
                                     suggestions = user.crntTeam.declinedSuggestions;
                                   },
-                                  textStyle: TextStyle(
-                                    color: d
+                                  child: Text(
+                                    'Declined Suggestions',
+                                    style: TextStyle(
+                                      color: d
+                                    ),
                                   ),
-                                  child: const Text('Declined Suggestions'),
                                 ),
                             ],
                         icon: const Icon(
-                          Icons.filter_list
+                          Icons.filter_list,
+                          color: Colors.white,
                         ),
                         onSelected: (value){
                             if(value == 1){

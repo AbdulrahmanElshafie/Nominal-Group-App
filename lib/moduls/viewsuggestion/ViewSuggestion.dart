@@ -153,7 +153,8 @@ class _SuggestionState extends State<ViewSuggestion> {
                                                               db.collection('Teams').doc(user.crntTeam.username).collection('Suggestions')
                                                                   .doc(widget.suggestion.sid).collection('Comments').doc(widget.suggestion.comments[index].uid).update(
                                                                   {
-                                                                    'edits': ++widget.suggestion.comments[index].edits
+                                                                    'edits': ++widget.suggestion.comments[index].edits,
+                                                                    'comment': editingController.text
                                                                   }
                                                               );
                                                               Navigator.pop(context);
@@ -163,7 +164,7 @@ class _SuggestionState extends State<ViewSuggestion> {
 
                                                             },
                                                             child: const Text(
-                                                                'Add Comment'
+                                                                'Edit Comment'
                                                             )
                                                         )
                                                       ],
@@ -343,16 +344,30 @@ class _SuggestionState extends State<ViewSuggestion> {
                                             .doc(widget.suggestion.sid).collection('Comments').doc(comment.uid).set(
                                             {
                                               'comment': commentController.text,
-                                              'uid': comment.uid,
                                               'edits': 0
                                             }
                                         );
+                                        for(var member in user.crntTeam.members){
+                                          if(member.uid != user.uid){
+                                            await db.collection('Users').doc(member.uid).collection('Notifications').add(
+                                                {
+                                                  'seen': false,
+                                                  'type': 1,
+                                                  'Team Name': user.crntTeam.name,
+                                                  'Team Username': user.crntTeam.username,
+                                                  'Suggestion Title': widget.suggestion.title,
+                                                  'sid': widget.suggestion.sid
+                                                }
+                                            );
+                                          }
+                                        }
+
+
                                         Navigator.pop(context);
                                         commentController.text = '';
                                         setState(() {
 
                                         });
-
                                       },
                                       child: const Text(
                                           'Add Comment'

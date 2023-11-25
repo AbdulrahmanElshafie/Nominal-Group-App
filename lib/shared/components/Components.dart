@@ -4,6 +4,7 @@ import 'package:nominal_group/models/Account.dart';
 import 'package:translator/translator.dart';
 import '../../models/Comment.dart';
 import '../../models/Suggestion.dart';
+import '../../models/Update.dart';
 
 // Text Input
 class TextInput extends StatefulWidget{
@@ -110,7 +111,7 @@ class Btn extends StatelessWidget{
           width: 320,
           alignment: Alignment.center,
           decoration: BoxDecoration(
-              color: Colors.blue,
+              color: Colors.lightBlue,
               borderRadius: BorderRadius.circular(20)
           ),
           child: Text(
@@ -293,4 +294,55 @@ class _NavBarState extends State<NavBar> {
       // animationDuration: const Duration(microseconds: 1000),
     );
   }
+}
+
+updateTeamMembers(teamId) async {
+  List<Account> members = [];
+  await db.collection("Teams").doc(teamId).collection('Members').get().then(
+          (querySnapshot) async {
+            for (var docSnapshot in querySnapshot.docs){
+              Account member = Account(uid: docSnapshot.id);
+              await db.collection('Users').doc(docSnapshot.id).get().then(
+                  (doc){
+                    final data = doc.data() as Map<String, dynamic>;
+                    member.name = data['name'];
+                    member.email = data['email'];
+                  }
+              );
+
+              members.add(member);
+            }
+      },
+      onError: (e) => print("Error completing: $e"),
+  );
+
+  user.crntTeam.members = members;
+}
+
+updateTeamData(teamId){
+  updateSuggestions(teamId);
+  updateTeamMembers(teamId);
+}
+
+
+updateNotifications() async {
+  List<Update> updates = [];
+  await db.collection('Users').doc(user.uid).collection('Notifications').get().then(
+          (querySnapShot){
+        for(var docSnapShot in querySnapShot.docs){
+          Update notification = Update(nid: docSnapShot.id ,sid: docSnapShot.data()['sid'], teamName: docSnapShot.data()['Team Name'],
+              teamUserName: docSnapShot.data()['Team Username'], suggestionTitle: docSnapShot.data()['Suggestion Title'],
+              type: docSnapShot.data()['type']);
+          notification.seen = docSnapShot.data()['seen'];
+
+          updates.add(notification);
+        }
+      }
+  );
+  user.notifications = updates;
+}
+
+updateAll(teamId){
+  updateNotifications();
+  updateTeamData(teamId);
 }

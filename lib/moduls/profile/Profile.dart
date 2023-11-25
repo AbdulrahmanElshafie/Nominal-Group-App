@@ -4,8 +4,14 @@ import 'package:flutter/material.dart';
 import '../../models/Team.dart';
 import '../../shared/components/Components.dart';
 
-class Profile extends StatelessWidget {
-  Profile({super.key});
+class Profile extends StatefulWidget {
+  const Profile({super.key});
+
+  @override
+  State<Profile> createState() => _ProfileState();
+}
+
+class _ProfileState extends State<Profile> {
   TextEditingController teamNameController = TextEditingController(),
       teamUserNameController = TextEditingController();
 
@@ -13,10 +19,10 @@ class Profile extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(
+        title: const Text(
             'Profile'
         ),
-        leading: Icon(
+        leading: const Icon(
           Icons.person
         ),
       ),
@@ -27,11 +33,11 @@ class Profile extends StatelessWidget {
             children: [
               Text(
                 'Name: ${user.name}',
-                style: TextStyle(
+                style: const TextStyle(
                   fontSize: 18
                 ),
               ),
-              SizedBox(
+              const SizedBox(
                 height: 20,
               ),
               SizedBox(
@@ -40,9 +46,9 @@ class Profile extends StatelessWidget {
                   itemBuilder: (BuildContext context, int index){
                     return GestureDetector(
                       child: Container(
-                        height: 100,
+                        height: 120,
                         width: double.infinity,
-                        color: user.crntTeam == user.teams.elementAt(index)? Colors.green[300]: Colors.blue[300],
+                        color: user.crntTeam.username == user.teams.elementAt(index).username? Colors.greenAccent: Colors.lightBlue,
                         child: Padding(
                           padding: const EdgeInsets.symmetric(horizontal: 20),
                           child: Column(
@@ -51,9 +57,10 @@ class Profile extends StatelessWidget {
                             children: [
                               Text(
                                 user.teams.elementAt(index).name,
-                                style: const TextStyle(
+                                style: TextStyle(
                                     fontWeight: FontWeight.bold,
-                                    fontSize: 18
+                                    fontSize: 18,
+                                    color: user.crntTeam.username == user.teams.elementAt(index).username? Colors.black: Colors.white
                                 ),
                               ),
                               const SizedBox(
@@ -61,46 +68,54 @@ class Profile extends StatelessWidget {
                               ),
                               Text(
                                 'Accepted Suggestions: ${user.teams.elementAt(index).acceptedSuggestions.length}',
-                                style: const TextStyle(
+                                style: TextStyle(
                                   fontSize: 13,
+                                  color: user.crntTeam.username == user.teams.elementAt(index).username? Colors.black: Colors.white
                                 ),
                               ),
-                              SizedBox(
+                              const SizedBox(
                                 height: 5,
                               ),
                               Text(
                                 'Declined Suggestions: ${user.teams.elementAt(index).declinedSuggestions.length}',
-                                style: const TextStyle(
+                                style: TextStyle(
                                   fontSize: 13,
+                                  color: user.crntTeam.username == user.teams.elementAt(index).username? Colors.black: Colors.white
                                 ),
                               ),
-                              SizedBox(
+                              const SizedBox(
                                 height: 5,
                               ),
                               Text(
                                 'Pending Suggestions: ${user.teams.elementAt(index).pendingSuggestions.length}',
-                                style: const TextStyle(
+                                style: TextStyle(
                                   fontSize: 13,
+                                  color: user.crntTeam.username == user.teams.elementAt(index).username? Colors.black: Colors.white
                                 ),
                               ),
                             ],
                           ),
                         ),
                       ),
-                      onTap: (){
+                      onTap: () async {
                         user.crntTeam = user.teams.elementAt(index);
-                        Navigator.pushNamed(context, '/home');
+                        await updateTeamData(user.crntTeam.username);
+                        await Navigator.pushNamed(context, '/home');
+                        setState(() {
+
+                        });
                       },
                     );
                   },
                   separatorBuilder: (BuildContext context, int index) => const Divider(
                     thickness: 1,
                     color: Colors.black,
+                    height: 0,
                   ),
                   itemCount: user.teams.length,
                 ),
               ),
-              SizedBox(
+              const SizedBox(
                 height: 20,
               ),
               Btn(
@@ -175,10 +190,10 @@ class Profile extends StatelessWidget {
                                 Btn(
                                     onTap: () async {
 
-                                      Team _team;
+                                      Team team0;
                                       bool isJoined = false;
-                                      for(_team in user.teams){
-                                        if(_team.username == teamUserNameController.text.trim()){
+                                      for(team0 in user.teams){
+                                        if(team0.username == teamUserNameController.text.trim()){
                                           isJoined = true;
                                         }
                                       }
@@ -198,16 +213,19 @@ class Profile extends StatelessWidget {
                                           onError: (e) => print("Error getting document: $e"),
                                         );
 
-                                        db.collection('Users').doc(user.uid).collection('Teams').
+                                        await db.collection('Users').doc(user.uid).collection('Teams').
                                         doc(teamUserNameController.text.trim()).set(
                                             {
                                               'Team Name': user.crntTeam.name
                                             }
                                         );
 
-                                        db.collection('Teams').doc(teamUserNameController.text.trim()).collection('Members').doc(user.uid);
+                                        db.collection('Teams').doc(teamUserNameController.text.trim()).collection('Members').doc(user.uid).set(
+                                          {
 
-                                        updateSuggestions(teamUserNameController.text.trim());
+                                          });
+
+                                        await updateTeamData(teamUserNameController.text.trim());
 
                                         teamUserNameController.clear();
                                         Navigator.pushNamed(context, '/home');

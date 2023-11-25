@@ -3,7 +3,7 @@ import 'package:nominal_group/models/Account.dart';
 import 'package:nominal_group/shared/components/Components.dart';
 
 class AdminScreen extends StatefulWidget{
-  AdminScreen({super.key});
+  const AdminScreen({super.key});
 
   @override
   State<AdminScreen> createState() => _AdminScreenState();
@@ -82,7 +82,7 @@ class _AdminScreenState extends State<AdminScreen> {
                       return Container(
                         height: 80,
                         width: double.infinity,
-                        color: Colors.blue[400],
+                        color: Colors.lightBlue,
                         child: Padding(
                           padding: const EdgeInsets.symmetric(horizontal: 20),
                           child: Column(
@@ -113,6 +113,7 @@ class _AdminScreenState extends State<AdminScreen> {
                     separatorBuilder: (BuildContext context, int index) => const Divider(
                       thickness: 1,
                       color: Colors.black,
+                      height: 0,
                     ),
                     itemCount: user.crntTeam.members.length,
                   ),
@@ -126,7 +127,7 @@ class _AdminScreenState extends State<AdminScreen> {
                           context: context,
                           builder: (BuildContext context){
                             return AlertDialog(
-                              title: Text('Delete the Team, Sure? '),
+                              title: const Text('Delete the Team, Sure? '),
                               content: Column(
                                 mainAxisSize: MainAxisSize.min,
                                 children: [
@@ -165,7 +166,7 @@ class _AdminScreenState extends State<AdminScreen> {
                           context: context,
                           builder: (BuildContext context){
                             return AlertDialog(
-                              title: Text('Change Team Name'),
+                              title: const Text('Change Team Name'),
                               content: Column(
                                 mainAxisSize: MainAxisSize.min,
                                 children: [

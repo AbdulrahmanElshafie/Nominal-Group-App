@@ -74,7 +74,7 @@ class MemberScreen extends StatelessWidget {
                       return Container(
                         height: 80,
                         width: double.infinity,
-                        color: Colors.blue[400],
+                        color: Colors.lightBlue,
                         child: Padding(
                           padding: const EdgeInsets.symmetric(horizontal: 20),
                           child: Column(
@@ -105,6 +105,7 @@ class MemberScreen extends StatelessWidget {
                     separatorBuilder: (BuildContext context, int index) => const Divider(
                       thickness: 1,
                       color: Colors.black,
+                      height: 0,
                     ),
                     itemCount: user.crntTeam.members.length,
                   ),
@@ -118,7 +119,7 @@ class MemberScreen extends StatelessWidget {
                           context: context,
                           builder: (BuildContext context){
                             return AlertDialog(
-                              title: Text('Leave the Team, Sure? '),
+                              title: const Text('Leave the Team, Sure? '),
                               content: Column(
                                 mainAxisSize: MainAxisSize.min,
                                 children: [

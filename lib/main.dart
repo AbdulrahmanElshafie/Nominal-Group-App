@@ -7,7 +7,6 @@ import 'package:nominal_group/moduls/login/Login.dart';
 import 'package:nominal_group/moduls/notifications/Notifications.dart';
 import 'package:nominal_group/moduls/profile/Profile.dart';
 import 'package:nominal_group/moduls/register/Register.dart';
-import 'package:nominal_group/moduls/team/Member.dart';
 import 'models/Account.dart';
 import 'models/Team.dart';
 import 'moduls/team/TeamScreen.dart';
@@ -26,24 +25,6 @@ Future<void> main() async {
           for (var docSnapshot in querySnapshot.docs) {
 
             Team team = Team(name: docSnapshot.data()['Team Name'], username: docSnapshot.id);
-            await db.collection('Teams').doc(docSnapshot.id).collection('Members').get().then(
-                    (querySnapshot2) async {
-
-                      for(var docSnapshot2 in querySnapshot2.docs){
-
-                        Account member = Account(uid: docSnapshot2.id);
-                       await db.collection('Users').doc(docSnapshot2.id).get().then(
-                            (DocumentSnapshot doc){
-                              final data = doc.data() as Map<String, dynamic>;
-                              member.name = data['name'];
-                              member.email = data['email'];
-                            }
-                        );
-                        team.members.add(member);
-                      }
-                    }
-
-            );
 
             await db.collection('Teams').doc(docSnapshot.id).get().then(
                 (DocumentSnapshot doc) async {
@@ -65,6 +46,9 @@ Future<void> main() async {
     );
 
    user.crntTeam = user.teams.first;
+
+   await updateNotifications();
+   await updateTeamData(user.crntTeam.username);
   }
   runApp(const MyApp());
 }
@@ -74,8 +58,6 @@ class MyApp extends StatelessWidget {
 
   Widget start(){
     if(FirebaseAuth.instance.currentUser != null){
-      updateSuggestions(user.crntTeam.username);
-
       return const Home();
     } else {
       return Register();
@@ -91,9 +73,9 @@ class MyApp extends StatelessWidget {
       routes: {
         '/login': (context) =>  Login(),
         'register': (context) => Register(),
-        '/teams': (context) => TeamScreen(),
+        '/teams': (context) => const TeamScreen(),
         '/home': (context) => const Home(),
-        '/profile': (context) => Profile(),
+        '/profile': (context) => const Profile(),
         '/notifications': (context) => const Notifications(),
       },
     );
