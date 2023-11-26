@@ -67,5 +67,5 @@ A Flutter project that implements the "Nominal Group" technique. This technique 
 -  Reset account password
 
 The app has an Android version and a web version
-You can try the [Nominal Group App web version here]([url](https://nominal-group-app.web.app/)https://nominal-group-app.web.app/)
-And you can try the [Android version here]([url](https://drive.google.com/file/d/1dEE7P25QwNK8rFrfPkmLec1yvETZxPdW/view?usp=sharing)https://drive.google.com/file/d/1dEE7P25QwNK8rFrfPkmLec1yvETZxPdW/view?usp=sharing)
+You can try the Nominal Group App web version here: https://nominal-group-app.web.app/)https://nominal-group-app.web.app/)
+And you can try the Android version here: https://drive.google.com/file/d/1dEE7P25QwNK8rFrfPkmLec1yvETZxPdW/view?usp=sharing)https://drive.google.com/file/d/1dEE7P25QwNK8rFrfPkmLec1yvETZxPdW/view?usp=sharing
