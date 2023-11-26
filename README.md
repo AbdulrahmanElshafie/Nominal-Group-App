@@ -1,10 +1,10 @@
 # Nominal Group App
 
 ## Nominal Group 
-## What's Nominal Group?
+### What's Nominal Group?
 A Flutter project that implements the "Nominal Group" technique. This technique is used for various situations when working with teams during discussions, brainstorming, and ideation processes. 
 
-## When to use the Nominal Group Technique?
+### When to use the Nominal Group Technique?
 -  Some group members are much more vocal than others
 -  Some group members think better in silence
 -  There is concern about some members not participating
@@ -12,7 +12,7 @@ A Flutter project that implements the "Nominal Group" technique. This technique 
 -  Some or all group members are new to the team
 -  The issue is controversial or there is a heated conflict between team members
 
-## Nominal Group Steps
+### Nominal Group Steps
 1.  Stating the problem/discussion topic
 2.  Each team member thinks about solutions/ideas/etc
 3.  Each one adds his solution/idea to a piece of paper
@@ -21,14 +21,14 @@ A Flutter project that implements the "Nominal Group" technique. This technique 
 5.  After all team members have finished, each one of the team sets a score for each idea/votes for each idea with yes or no
 6.  Then the organizer takes the results and tells the solution with the highest score 
 
-## Application Features 
-### Profile Page
+### Application Features 
+#### Profile Page
 -  Each user can join/create as many teams as he wants
   - Create a team by adding team's name and team's username
   - Join the team by using the team's username 
 -  User can navigate between teams
 
-### Tean Dashboard
+#### Tean Dashboard
 -  Available info for all team members:
   -  Insights about the team (number of approved, declined, and pending suggestions)
   -  Team name
@@ -37,11 +37,11 @@ A Flutter project that implements the "Nominal Group" technique. This technique 
   -  If the user is the team owner (the one who has created the team) he can change the team's name or delete the entire team
   -  If the user is not the owner of the team he can leave the team whenever he wants
 
- ### Notifications
+ #### Notifications
 -   Whenever a new suggestion or a new comment has been added a notification will be sent to all team members
 -   When clicking on a notification the user will be sent to its source
 
-### Home
+#### Home
 - All suggestions in a specific team
 - Add a new suggestion
   -  Adds a title for the suggestion
@@ -52,7 +52,7 @@ A Flutter project that implements the "Nominal Group" technique. This technique 
   - Pending Suggestions
 - Button on the top left of the header bar to refresh the team's data when clicked 
 
-### Suggestion
+#### Suggestion
 -  Up/down button to vote
 -  Add a comment on the suggestion
   - Each user can add one comment and able to edit it 3 times
