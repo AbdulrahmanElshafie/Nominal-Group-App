@@ -75,7 +75,7 @@ class Register extends StatelessWidget{
                                   "name": nameController.text.trim()
                                 });
 
-                            Navigator.pushNamed(context, '/teams');
+                            Navigator.pushNamed(context, '/home');
 
                           }
                         } on FirebaseAuthException catch (e) {
