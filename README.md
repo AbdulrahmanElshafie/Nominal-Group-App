@@ -1,5 +1,6 @@
 # Nominal Group App
 
+## Nominal Group 
 ## What's Nominal Group?
 A Flutter project that implements the "Nominal Group" technique. This technique is used for various situations when working with teams during discussions, brainstorming, and ideation processes. 
 
